@@ -10,7 +10,9 @@ namespace GraphQL\Type\Definition;
 interface WrappingType
 {
     /**
-     * @param bool $recurse
+     * 获取被包裹的类型对象
+     *
+     * @param bool $recurse 递归
      *
      * @return ObjectType|InterfaceType|UnionType|ScalarType|InputObjectType|EnumType
      */
