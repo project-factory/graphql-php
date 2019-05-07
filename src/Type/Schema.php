@@ -26,18 +26,19 @@ use function is_callable;
 use function sprintf;
 
 /**
- * Schema Definition (see [related docs](type-system/schema.md))
+ * Schema 定义 (查看 [相关文档](type-system/schema.md))
  *
- * A Schema is created by supplying the root types of each type of operation:
- * query, mutation (optional) and subscription (optional). A schema definition is
- * then supplied to the validator and executor. Usage Example:
+ * 通过提供每种操作类型的根类型来创建 Schema 对象：
+ *      query（必须） / mutation（可选） /  subscription（可选）
+ *
+ * 然后将 Schema 定义提供给验证器和执行器，用法示例：
  *
  *     $schema = new GraphQL\Type\Schema([
  *       'query' => $MyAppQueryRootType,
  *       'mutation' => $MyAppMutationRootType,
  *     ]);
  *
- * Or using Schema Config instance:
+ * 或者使用 Schema Config 实例:
  *
  *     $config = GraphQL\Type\SchemaConfig::create()
  *         ->setQuery($MyAppQueryRootType)
@@ -51,7 +52,7 @@ class Schema
     private $config;
 
     /**
-     * Contains currently resolved schema types
+     * 包含当前已解析的 Schema 类型
      *
      * @var Type[]
      */
@@ -74,6 +75,7 @@ class Schema
     public $extensionASTNodes;
 
     /**
+     * 构造方法，接收一个 SchemaConfig 对象，或者一个 Array 对象
      * @param mixed[]|SchemaConfig $config
      *
      * @api
@@ -108,16 +110,16 @@ class Schema
                 Utils::getVariableType($config)
             );
             Utils::invariant(
-                ! $config->types || is_array($config->types) || is_callable($config->types),
+                !$config->types || is_array($config->types) || is_callable($config->types),
                 '"types" must be array or callable if provided but got: ' . Utils::getVariableType($config->types)
             );
             Utils::invariant(
-                ! $config->directives || is_array($config->directives),
+                !$config->directives || is_array($config->directives),
                 '"directives" must be Array if provided but got: ' . Utils::getVariableType($config->directives)
             );
         }
 
-        $this->config            = $config;
+        $this->config = $config;
         $this->extensionASTNodes = $config->extensionASTNodes;
 
         if ($config->query) {
@@ -164,7 +166,7 @@ class Schema
             $types = $types();
         }
 
-        if (! is_array($types) && ! $types instanceof Traversable) {
+        if (!is_array($types) && !$types instanceof Traversable) {
             throw new InvariantViolation(sprintf(
                 'Schema types callable must return array or instance of Traversable but got: %s',
                 Utils::getVariableType($types)
@@ -172,7 +174,7 @@ class Schema
         }
 
         foreach ($types as $index => $type) {
-            if (! $type instanceof Type) {
+            if (!$type instanceof Type) {
                 throw new InvariantViolation(sprintf(
                     'Each entry of schema types must be instance of GraphQL\Type\Definition\Type but entry at %s is %s',
                     $index,
@@ -195,9 +197,9 @@ class Schema
      */
     public function getTypeMap()
     {
-        if (! $this->fullyLoaded) {
+        if (!$this->fullyLoaded) {
             $this->resolvedTypes = $this->collectAllTypes();
-            $this->fullyLoaded   = true;
+            $this->fullyLoaded = true;
         }
 
         return $this->resolvedTypes;
@@ -213,7 +215,7 @@ class Schema
             $typeMap = TypeInfo::extractTypes($type, $typeMap);
         }
         foreach ($this->getDirectives() as $directive) {
-            if (! ($directive instanceof Directive)) {
+            if (!($directive instanceof Directive)) {
                 continue;
             }
 
@@ -298,9 +300,9 @@ class Schema
      */
     public function getType($name)
     {
-        if (! isset($this->resolvedTypes[$name])) {
+        if (!isset($this->resolvedTypes[$name])) {
             $type = $this->loadType($name);
-            if (! $type) {
+            if (!$type) {
                 return null;
             }
             $this->resolvedTypes[$name] = $type;
@@ -328,13 +330,13 @@ class Schema
     {
         $typeLoader = $this->config->typeLoader;
 
-        if (! $typeLoader) {
+        if (!$typeLoader) {
             return $this->defaultTypeLoader($typeName);
         }
 
         $type = $typeLoader($typeName);
 
-        if (! $type instanceof Type) {
+        if (!$type instanceof Type) {
             throw new InvariantViolation(
                 sprintf(
                     'Type loader is expected to return valid type "%s", but it returned %s',
@@ -392,7 +394,7 @@ class Schema
             foreach ($this->getTypeMap() as $type) {
                 if ($type instanceof ObjectType) {
                     foreach ($type->getInterfaces() as $interface) {
-                        if (! ($interface instanceof InterfaceType)) {
+                        if (!($interface instanceof InterfaceType)) {
                             continue;
                         }
 
@@ -481,7 +483,7 @@ class Schema
             $type->assertValid();
 
             // Make sure type loader returns the same instance as registered in other places of schema
-            if (! $this->config->typeLoader) {
+            if (!$this->config->typeLoader) {
                 continue;
             }
 
@@ -496,9 +498,9 @@ class Schema
     }
 
     /**
-     * Validates schema.
+     * 验证 Schema
      *
-     * This operation requires full schema scan. Do not use in production environment.
+     * 此操作需要完整的扫描 Schema 定义，请不要在生产环境下使用
      *
      * @return InvariantViolation[]|Error[]
      *
@@ -506,18 +508,18 @@ class Schema
      */
     public function validate()
     {
-        // If this Schema has already been validated, return the previous results.
+        // 如果此架构已经过验证，请返回先前的结果
         if ($this->validationErrors !== null) {
             return $this->validationErrors;
         }
-        // Validate the schema, producing a list of errors.
+
+        // 验证当前 Schema, 生成错误列表
         $context = new SchemaValidationContext($this);
         $context->validateRootTypes();
         $context->validateDirectives();
         $context->validateTypes();
 
-        // Persist the results of validation before returning to ensure validation
-        // does not run multiple times for this schema.
+        // 在返回之前保留验证结果，以确保此 Schema 的验证不会多次运行
         $this->validationErrors = $context->getErrors();
 
         return $this->validationErrors;

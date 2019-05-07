@@ -13,9 +13,9 @@ trigger_error(
 );
 
 /**
- * Schema Definition
+ * Schema 定义
  *
- * @deprecated moved to GraphQL\Type\Schema
+ * @deprecated 实现转移至 GraphQL\Type\Schema
  */
 class Schema extends \GraphQL\Type\Schema
 {

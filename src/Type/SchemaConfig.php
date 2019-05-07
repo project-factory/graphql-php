@@ -13,11 +13,13 @@ use GraphQL\Utils\Utils;
 use function is_callable;
 
 /**
- * Schema configuration class.
- * Could be passed directly to schema constructor. List of options accepted by **create** method is
- * [described in docs](type-system/schema.md#configuration-options).
+ * Schema 配置类
  *
- * Usage example:
+ * 此类实例化对象可以直接传递给 Schema 构造函数，用来创建 Schema 对象
+ *
+ * 静态 create 方法接受的选项列表 [文档描述](type-system/schema.md#configuration-options).
+ *
+ * 用法示例:
  *
  *     $config = SchemaConfig::create()
  *         ->setQuery($myQueryType)
@@ -68,7 +70,7 @@ class SchemaConfig
     {
         $config = new static();
 
-        if (! empty($options)) {
+        if (!empty($options)) {
             if (isset($options['query'])) {
                 $config->setQuery($options['query']);
             }
@@ -103,7 +105,7 @@ class SchemaConfig
             }
 
             if (isset($options['assumeValid'])) {
-                $config->setAssumeValid((bool) $options['assumeValid']);
+                $config->setAssumeValid((bool)$options['assumeValid']);
             }
 
             if (isset($options['extensionASTNodes'])) {
