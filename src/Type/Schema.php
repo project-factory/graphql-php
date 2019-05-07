@@ -48,11 +48,15 @@ use function sprintf;
  */
 class Schema
 {
-    /** @var SchemaConfig */
+    /**
+     * 当前 Schema 的配置项
+     *
+     * @var SchemaConfig
+     */
     private $config;
 
     /**
-     * 包含当前已解析的 Schema 类型
+     * 包含当前已解析成功的 Schema 类型数组
      *
      * @var Type[]
      */
@@ -71,14 +75,21 @@ class Schema
     /** @var InvariantViolation[]|null */
     private $validationErrors;
 
-    /** @var SchemaTypeExtensionNode[] */
+    /**
+     * 当前
+     *
+     * @var SchemaTypeExtensionNode[]
+     */
     public $extensionASTNodes;
 
     /**
      * 构造方法，接收一个 SchemaConfig 对象，或者一个 Array 对象
-     * @param mixed[]|SchemaConfig $config
+     *
+     * @param mixed[]|SchemaConfig $config 配置项
      *
      * @api
+     *
+     * @see https://webonyx.github.io/graphql-php/type-system/schema/
      */
     public function __construct($config)
     {
@@ -86,13 +97,11 @@ class Schema
             $config = SchemaConfig::create($config);
         }
 
-        // If this schema was built from a source known to be valid, then it may be
-        // marked with assumeValid to avoid an additional type system validation.
+        // 如果此 Schema 是从已知有效的源构建的，则可以使用 assumeValid 标记该 Schema 以避免其他类型的系统验证
         if ($config->getAssumeValid()) {
             $this->validationErrors = [];
         } else {
-            // Otherwise check for common mistakes during construction to produce
-            // clear and early error messages.
+            // 否则，在构造新的 Schema 过程中检查常见错误，以产生明确的早期错误消息。
             Utils::invariant(
                 $config instanceof SchemaConfig,
                 'Schema constructor expects instance of GraphQL\Type\SchemaConfig or an array with keys: %s; but got: %s',
@@ -147,11 +156,12 @@ class Schema
         }
         $this->resolvedTypes += Type::getStandardTypes() + Introspection::getTypes();
 
+        // 是否延迟加载类型，类型加载概念与 PHP 类加载非常相似，但请记住，typeLoader 必须始终返回相同的类型实例
         if ($this->config->typeLoader) {
             return;
         }
 
-        // Perform full scan of the schema
+        // 默认情况下，将执行 Schema 的完整扫描
         $this->getTypeMap();
     }
 
@@ -186,10 +196,9 @@ class Schema
     }
 
     /**
-     * Returns array of all types in this schema. Keys of this array represent type names, values are instances
-     * of corresponding type definitions
+     * 返回此 Schema 中所有类型的数组，此数组的键表示类型名称，值是相应类型定义的实例
      *
-     * This operation requires full schema scan. Do not use in production environment.
+     * 此操作需要完整的 Schema 扫描，不要在生产环境中使用
      *
      * @return Type[]
      *
@@ -232,7 +241,7 @@ class Schema
     }
 
     /**
-     * Returns a list of directives supported by this schema
+     * 返回此架构支持的指令列表
      *
      * @return Directive[]
      *
@@ -430,7 +439,7 @@ class Schema
     }
 
     /**
-     * Returns instance of directive by name
+     * 按名称返回指令的实例
      *
      * @param string $name
      *
@@ -458,13 +467,15 @@ class Schema
     }
 
     /**
-     * Validates schema.
+     * 验证 schema.
      *
-     * This operation requires full schema scan. Do not use in production environment.
+     * 此操作需要完整模式扫描，不要在生产环境中使用。
      *
      * @throws InvariantViolation
      *
      * @api
+     *
+     * @see https://webonyx.github.io/graphql-php/type-system/schema/
      */
     public function assertValid()
     {

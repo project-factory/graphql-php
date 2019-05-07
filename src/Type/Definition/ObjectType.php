@@ -16,10 +16,9 @@ use function is_string;
 use function sprintf;
 
 /**
- * Object Type Definition
+ * 对象类型定义
  *
- * Almost all of the GraphQL types you define will be object types. Object types
- * have a name, but most importantly describe their fields.
+ * 您定义的几乎所有 GraphQL 类型都是对象类型，对象类型有一个名称，但最重要的是描述它们的字段
  *
  * Example:
  *
@@ -37,9 +36,7 @@ use function sprintf;
  *       ]
  *     ]);
  *
- * When two types need to refer to each other, or a type needs to refer to
- * itself in a field, you can use a function expression (aka a closure or a
- * thunk) to supply the fields lazily.
+ * 当两种类型需要相互引用，或者类型需要在字段中引用自身时，可以使用函数表达式（也就是闭包或 thunk ）来懒惰地提供字段
  *
  * Example:
  *
@@ -65,7 +62,11 @@ class ObjectType extends Type implements OutputType, CompositeType, NullableType
     /** @var callable */
     public $resolveFieldFn;
 
-    /** @var FieldDefinition[] */
+    /**
+     * 当前对象包含的字段对象数组
+     *
+     * @var FieldDefinition[]
+     */
     private $fields;
 
     /** @var InterfaceType[] */
@@ -79,18 +80,18 @@ class ObjectType extends Type implements OutputType, CompositeType, NullableType
      */
     public function __construct(array $config)
     {
-        if (! isset($config['name'])) {
+        if (!isset($config['name'])) {
             $config['name'] = $this->tryInferName();
         }
 
         Utils::invariant(is_string($config['name']), 'Must provide name.');
 
-        $this->name              = $config['name'];
-        $this->description       = $config['description'] ?? null;
-        $this->resolveFieldFn    = $config['resolveField'] ?? null;
-        $this->astNode           = $config['astNode'] ?? null;
+        $this->name = $config['name'];
+        $this->description = $config['description'] ?? null;
+        $this->resolveFieldFn = $config['resolveField'] ?? null;
+        $this->astNode = $config['astNode'] ?? null;
         $this->extensionASTNodes = $config['extensionASTNodes'] ?? [];
-        $this->config            = $config;
+        $this->config = $config;
     }
 
     /**
@@ -126,6 +127,8 @@ class ObjectType extends Type implements OutputType, CompositeType, NullableType
     }
 
     /**
+     * 判断当前对象是否包含给定字段
+     *
      * @param string $name
      *
      * @return bool
@@ -140,6 +143,8 @@ class ObjectType extends Type implements OutputType, CompositeType, NullableType
     }
 
     /**
+     * 获取对象包含的字段对象数组
+     *
      * @return FieldDefinition[]
      *
      * @throws InvariantViolation
@@ -147,7 +152,7 @@ class ObjectType extends Type implements OutputType, CompositeType, NullableType
     public function getFields()
     {
         if ($this->fields === null) {
-            $fields       = $this->config['fields'] ?? [];
+            $fields = $this->config['fields'] ?? [];
             $this->fields = FieldDefinition::defineFieldMap($this, $fields);
         }
 
@@ -168,7 +173,7 @@ class ObjectType extends Type implements OutputType, CompositeType, NullableType
 
     private function getInterfaceMap()
     {
-        if (! $this->interfaceMap) {
+        if (!$this->interfaceMap) {
             $this->interfaceMap = [];
             foreach ($this->getInterfaces() as $interface) {
                 $this->interfaceMap[$interface->name] = $interface;
@@ -187,7 +192,7 @@ class ObjectType extends Type implements OutputType, CompositeType, NullableType
             $interfaces = $this->config['interfaces'] ?? [];
             $interfaces = is_callable($interfaces) ? call_user_func($interfaces) : $interfaces;
 
-            if ($interfaces !== null && ! is_array($interfaces)) {
+            if ($interfaces !== null && !is_array($interfaces)) {
                 throw new InvariantViolation(
                     sprintf('%s interfaces must be an Array or a callable which returns an Array.', $this->name)
                 );
@@ -200,7 +205,7 @@ class ObjectType extends Type implements OutputType, CompositeType, NullableType
     }
 
     /**
-     * @param mixed[]      $value
+     * @param mixed[] $value
      * @param mixed[]|null $context
      *
      * @return bool|null

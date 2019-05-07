@@ -75,8 +75,8 @@ class Utils
     }
 
     /**
-     * @param object   $obj
-     * @param mixed[]  $vars
+     * @param object $obj
+     * @param mixed[] $vars
      * @param string[] $requiredKeys
      *
      * @return object
@@ -84,13 +84,13 @@ class Utils
     public static function assign($obj, array $vars, array $requiredKeys = [])
     {
         foreach ($requiredKeys as $key) {
-            if (! isset($vars[$key])) {
+            if (!isset($vars[$key])) {
                 throw new InvalidArgumentException(sprintf('Key %s is expected to be set and not to be null', $key));
             }
         }
 
         foreach ($vars as $key => $value) {
-            if (! property_exists($obj, $key)) {
+            if (!property_exists($obj, $key)) {
                 $cls = get_class($obj);
                 Warning::warn(
                     sprintf("Trying to set non-existing property '%s' on class '%s'", $key, $cls),
@@ -139,12 +139,12 @@ class Utils
         );
 
         $result = [];
-        $assoc  = false;
+        $assoc = false;
         foreach ($traversable as $key => $value) {
-            if (! $assoc && ! is_int($key)) {
+            if (!$assoc && !is_int($key)) {
                 $assoc = true;
             }
-            if (! $predicate($value, $key)) {
+            if (!$predicate($value, $key)) {
                 continue;
             }
 
@@ -193,7 +193,7 @@ class Utils
         $map = [];
         foreach ($traversable as $key => $value) {
             [$newKey, $newValue] = $fn($value, $key);
-            $map[$newKey]        = $newValue;
+            $map[$newKey] = $newValue;
         }
 
         return $map;
@@ -216,7 +216,7 @@ class Utils
         $map = [];
         foreach ($traversable as $key => $value) {
             $newKey = $keyFn($value, $key);
-            if (! is_scalar($newKey)) {
+            if (!is_scalar($newKey)) {
                 continue;
             }
 
@@ -263,7 +263,7 @@ class Utils
 
         $grouped = [];
         foreach ($traversable as $key => $value) {
-            $newKeys = (array) $keyFn($value, $key);
+            $newKeys = (array)$keyFn($value, $key);
             foreach ($newKeys as $newKey) {
                 $grouped[$newKey][] = $value;
             }
@@ -295,7 +295,7 @@ class Utils
     public static function every($traversable, callable $predicate)
     {
         foreach ($traversable as $key => $value) {
-            if (! $predicate($value, $key)) {
+            if (!$predicate($value, $key)) {
                 return false;
             }
         }
@@ -304,12 +304,14 @@ class Utils
     }
 
     /**
-     * @param bool   $test
-     * @param string $message
+     * 抛出格式化之后的异常对象
+     *
+     * @param bool $test 为 false 时抛出 InvariantViolation 异常
+     * @param string $message 异常内容格式
      */
     public static function invariant($test, $message = '')
     {
-        if (! $test) {
+        if (!$test) {
             if (func_num_args() > 2) {
                 $args = func_get_args();
                 array_shift($args);
@@ -321,6 +323,8 @@ class Utils
     }
 
     /**
+     * 获取指定变量的类型名称，或者对象的完整类名
+     *
      * @param Type|mixed $var
      *
      * @return string
@@ -347,7 +351,7 @@ class Utils
     public static function printSafeJson($var)
     {
         if ($var instanceof stdClass) {
-            $var = (array) $var;
+            $var = (array)$var;
         }
         if (is_array($var)) {
             return json_encode($var);
@@ -368,7 +372,7 @@ class Utils
             return sprintf('"%s"', $var);
         }
         if (is_scalar($var)) {
-            return (string) $var;
+            return (string)$var;
         }
 
         return gettype($var);
@@ -386,7 +390,7 @@ class Utils
         }
         if (is_object($var)) {
             if (method_exists($var, '__toString')) {
-                return (string) $var;
+                return (string)$var;
             }
 
             return 'instance of ' . get_class($var);
@@ -410,7 +414,7 @@ class Utils
             return $var;
         }
         if (is_scalar($var)) {
-            return (string) $var;
+            return (string)$var;
         }
 
         return gettype($var);
@@ -446,10 +450,10 @@ class Utils
      */
     public static function ord($char, $encoding = 'UTF-8')
     {
-        if (! $char && $char !== '0') {
+        if (!$char && $char !== '0') {
             return 0;
         }
-        if (! isset($char[1])) {
+        if (!isset($char[1])) {
             return ord($char);
         }
         if ($encoding !== 'UCS-4BE') {
@@ -463,7 +467,7 @@ class Utils
      * Returns UTF-8 char code at given $positing of the $string
      *
      * @param string $string
-     * @param int    $position
+     * @param int $position
      *
      * @return mixed
      */
@@ -493,7 +497,7 @@ class Utils
     }
 
     /**
-     * Upholds the spec rules about naming.
+     * 支持关于命名的规范规则
      *
      * @param string $name
      *
@@ -508,9 +512,9 @@ class Utils
     }
 
     /**
-     * Returns an Error if a name is invalid.
+     * 如果名称无效，则返回一个 Error
      *
-     * @param string    $name
+     * @param string $name
      * @param Node|null $node
      *
      * @return Error|null
@@ -527,7 +531,7 @@ class Utils
             );
         }
 
-        if (! preg_match('/^[_a-zA-Z][_a-zA-Z0-9]*$/', $name)) {
+        if (!preg_match('/^[_a-zA-Z][_a-zA-Z0-9]*$/', $name)) {
             return new Error(
                 sprintf('Names must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ but "%s" does not.', $name),
                 $node
@@ -588,9 +592,9 @@ class Utils
         if (count($items) === 0) {
             throw new LogicException('items must not need to be empty.');
         }
-        $selected       = array_slice($items, 0, 5);
+        $selected = array_slice($items, 0, 5);
         $selectedLength = count($selected);
-        $firstSelected  = $selected[0];
+        $firstSelected = $selected[0];
 
         if ($selectedLength === 1) {
             return $firstSelected;
@@ -616,7 +620,7 @@ class Utils
      * as a single edit which helps identify mis-cased values with an edit distance
      * of 1
      *
-     * @param string   $input
+     * @param string $input
      * @param string[] $options
      *
      * @return string[]
@@ -624,7 +628,7 @@ class Utils
     public static function suggestionList($input, array $options)
     {
         $optionsByDistance = [];
-        $inputThreshold    = mb_strlen($input) / 2;
+        $inputThreshold = mb_strlen($input) / 2;
         foreach ($options as $option) {
             if ($input === $option) {
                 $distance = 0;

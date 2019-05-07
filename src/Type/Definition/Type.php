@@ -22,27 +22,38 @@ use function trigger_error;
 use const E_USER_DEPRECATED;
 
 /**
- * Registry of standard GraphQL types
- * and a base class for all other types.
+ * 标准 GraphQL 类型的注册表和所有其他类型的基类。
  */
 abstract class Type implements JsonSerializable
 {
-    public const STRING  = 'String';
-    public const INT     = 'Int';
+    public const STRING = 'String';
+    public const INT = 'Int';
     public const BOOLEAN = 'Boolean';
-    public const FLOAT   = 'Float';
-    public const ID      = 'ID';
+    public const FLOAT = 'Float';
+    public const ID = 'ID';
 
-    /** @var Type[] */
+    /**
+     * 标准类型对象数组
+     *
+     * @var Type[]
+     */
     private static $standardTypes;
 
-    /** @var Type[] */
+    /**
+     * 所有内置类型对象数组
+     *
+     * @var Type[]
+     */
     private static $builtInTypes;
 
     /** @var string */
     public $name;
 
-    /** @var string|null */
+    /**
+     * 类型名称
+     *
+     * @var string|null
+     */
     public $description;
 
     /** @var TypeDefinitionNode|null */
@@ -55,6 +66,8 @@ abstract class Type implements JsonSerializable
     public $extensionASTNodes;
 
     /**
+     * 获取 ID 类型对象
+     *
      * @return IDType
      *
      * @api
@@ -65,7 +78,9 @@ abstract class Type implements JsonSerializable
     }
 
     /**
-     * @param string $name
+     * 根据类型名称，获取标准类型对象
+     *
+     * @param string $name 如果不传递名称，则返回所有类型对象
      *
      * @return (IDType|StringType|FloatType|IntType|BooleanType)[]|IDType|StringType|FloatType|IntType|BooleanType
      */
@@ -85,6 +100,8 @@ abstract class Type implements JsonSerializable
     }
 
     /**
+     * 获取 String 类型对象
+     *
      * @return StringType
      *
      * @api
@@ -95,6 +112,8 @@ abstract class Type implements JsonSerializable
     }
 
     /**
+     * 获取 Boolean 类型对象
+     *
      * @return BooleanType
      *
      * @api
@@ -105,6 +124,8 @@ abstract class Type implements JsonSerializable
     }
 
     /**
+     * 获取 Int 类型对象
+     *
      * @return IntType
      *
      * @api
@@ -115,6 +136,8 @@ abstract class Type implements JsonSerializable
     }
 
     /**
+     * 获取 Float 类型对象
+     *
      * @return FloatType
      *
      * @api
@@ -137,6 +160,8 @@ abstract class Type implements JsonSerializable
     }
 
     /**
+     * 获取 NonNull 类型对象
+     *
      * @param NullableType $wrappedType
      *
      * @return NonNull
@@ -149,7 +174,7 @@ abstract class Type implements JsonSerializable
     }
 
     /**
-     * Checks if the type is a builtin type
+     * 检查给定对象是否为内置类型
      *
      * @return bool
      */
@@ -159,8 +184,7 @@ abstract class Type implements JsonSerializable
     }
 
     /**
-     * Returns all builtin in types including base scalar and
-     * introspection types
+     * 返回所有内置类型，包括基本标量类型和 GraphQL 内置类型
      *
      * @return Type[]
      */
@@ -177,7 +201,7 @@ abstract class Type implements JsonSerializable
     }
 
     /**
-     * Returns all builtin scalar types
+     * 返回所有内置标准类型
      *
      * @return Type[]
      */
@@ -187,6 +211,8 @@ abstract class Type implements JsonSerializable
     }
 
     /**
+     * 已启用方法，请使用 Type::getStandardTypes
+     *
      * @deprecated Use method getStandardTypes() instead
      *
      * @return Type[]
@@ -199,6 +225,8 @@ abstract class Type implements JsonSerializable
     }
 
     /**
+     * 重写标准类型，用新的对象类型覆盖标准类型
+     *
      * @param Type[] $types
      */
     public static function overrideStandardTypes(array $types)
@@ -223,6 +251,8 @@ abstract class Type implements JsonSerializable
     }
 
     /**
+     * 判断给定的对象是
+     *
      * @param Type $type
      *
      * @return bool
@@ -233,7 +263,7 @@ abstract class Type implements JsonSerializable
     {
         return $type instanceof InputType &&
             (
-                ! $type instanceof WrappingType ||
+                !$type instanceof WrappingType ||
                 self::getNamedType($type) instanceof InputType
             );
     }
@@ -268,7 +298,7 @@ abstract class Type implements JsonSerializable
     {
         return $type instanceof OutputType &&
             (
-                ! $type instanceof WrappingType ||
+                !$type instanceof WrappingType ||
                 self::getNamedType($type) instanceof OutputType
             );
     }
@@ -398,7 +428,7 @@ abstract class Type implements JsonSerializable
         // If class is extended - infer name from className
         // QueryType -> Type
         // SomeOtherType -> SomeOther
-        $tmp  = new ReflectionClass($this);
+        $tmp = new ReflectionClass($this);
         $name = $tmp->getShortName();
 
         if ($tmp->getNamespaceName() !== __NAMESPACE__) {

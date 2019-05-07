@@ -13,7 +13,7 @@ use GraphQL\Utils\Utils;
 use function is_callable;
 
 /**
- * Schema 配置类
+ * Schema 配置类，此类只是单纯的保存 Schema 配置项，并不做额外的处理操作
  *
  * 此类实例化对象可以直接传递给 Schema 构造函数，用来创建 Schema 对象
  *
@@ -57,10 +57,9 @@ class SchemaConfig
     public $extensionASTNodes;
 
     /**
-     * Converts an array of options to instance of SchemaConfig
-     * (or just returns empty config when array is not passed).
+     * 将一个数组配置项转化为 SchemaConfig 对象，或者在未传递参数时返回一个空 SchemaConfig 对象
      *
-     * @param mixed[] $options
+     * @param mixed[] $options 配置项
      *
      * @return SchemaConfig
      *
