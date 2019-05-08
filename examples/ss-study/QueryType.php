@@ -9,19 +9,17 @@ class QueryType extends \GraphQL\Type\Definition\ObjectType
         $config = [
             "name"         => "Query",
             "fields"       => [
-                "user" => ["type" => self::user()]
+                "user" => ["type" => TypesDef::user()],
+                "post" => ["type" => TypesDef::post()]
             ],
             "resolveField" => function ($val, $args, $context, ResolveInfo $info) {
                 if ($info->fieldName == "user") {
-                    return new UserType();
+                    return new UserModel();
+                } elseif ($info->fieldName == "post") {
+                    return new PostModel();
                 }
             }
         ];
         parent::__construct($config);
-    }
-
-    public function user()
-    {
-        return new UserType();
     }
 }

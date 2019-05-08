@@ -3,6 +3,10 @@
 require_once "../../vendor/autoload.php";
 require_once "./QueryType.php";
 require_once "./UserType.php";
+require_once "./TypesDef.php";
+require_once "./UserModel.php";
+require_once "./PostModel.php";
+require_once "./PostType.php";
 
 try {
     $schema = new \GraphQL\Type\Schema([
