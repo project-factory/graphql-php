@@ -13,7 +13,7 @@ GraphQLUnionType;
 interface AbstractType
 {
     /**
-     * Resolves concrete ObjectType for given object value
+     * 为给定的对象值解析具体的 ObjectType
      *
      * @param object  $objectValue
      * @param mixed[] $context

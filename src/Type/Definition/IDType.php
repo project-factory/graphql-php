@@ -16,6 +16,9 @@ use function is_scalar;
 use function is_string;
 use function method_exists;
 
+/**
+ * ID 类型定义
+ */
 class IDType extends ScalarType
 {
     /** @var string */

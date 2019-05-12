@@ -14,8 +14,9 @@ use GraphQL\Type\Schema;
 use function array_merge_recursive;
 
 /**
- * Structure containing information useful for field resolution process.
- * Passed as 3rd argument to every field resolver. See [docs on field resolving (data fetching)](data-fetching.md).
+ * 包含对字段解析过程中有用的信息的结构
+ *
+ * 作为第三个参数传递给每个字段解析器，请参阅文档 [data-fetching.md]
  */
 class ResolveInfo
 {
