@@ -10,17 +10,16 @@ use JsonSerializable;
 use function array_map;
 
 /**
- * Returned after [query execution](executing-queries.md).
- * Represents both - result of successful execution and of a failed one
- * (with errors collected in `errors` prop)
+ * 查询结果定义 [阅读文档] (executing-queries.md)
  *
- * Could be converted to [spec-compliant](https://facebook.github.io/graphql/#sec-Response-Format)
- * serializable array using `toArray()`
+ * 两种响应都会返回同一种对象，成功执行的结果和失败的结果，错误收集在 errors 字段中
+ *
+ * 可以使用 toArray 转换为可序列化数组 [符合规范] (https://facebook.github.io/graphql/#sec-Response-Format)
  */
 class ExecutionResult implements JsonSerializable
 {
     /**
-     * Data collected from resolvers during query execution
+     * 在查询执行期间从解析器中收集的数据
      *
      * @api
      * @var mixed[]
@@ -28,10 +27,9 @@ class ExecutionResult implements JsonSerializable
     public $data;
 
     /**
-     * Errors registered during query execution.
+     * 在查询执行期间收集的错误
      *
-     * If an error was caused by exception thrown in resolver, $error->getPrevious() would
-     * contain original exception.
+     * 如果错误是由解析器中抛出的异常引起的，$error->getPrevious() 将包含原始异常
      *
      * @api
      * @var Error[]
@@ -39,8 +37,7 @@ class ExecutionResult implements JsonSerializable
     public $errors;
 
     /**
-     * User-defined serializable array of extensions included in serialized result.
-     * Conforms to
+     * 序列化结果中包含用户定义的可序列化扩展数组
      *
      * @api
      * @var mixed[]
@@ -66,13 +63,13 @@ class ExecutionResult implements JsonSerializable
     }
 
     /**
-     * Define custom error formatting (must conform to http://facebook.github.io/graphql/#sec-Errors)
+     * 自定义错误格式 (必须符合 http://facebook.github.io/graphql/#sec-Errors)
      *
-     * Expected signature is: function (GraphQL\Error\Error $error): array
+     * 预期的回调函数: function (GraphQL\Error\Error $error): array
      *
-     * Default formatter is "GraphQL\Error\FormattedError::createFromException"
+     * 默认的回调函数: "GraphQL\Error\FormattedError::createFromException"
      *
-     * Expected returned value must be an array:
+     * 预期返回值必须是数组:
      * array(
      *    'message' => 'errorMessage',
      *    // ... other keys
@@ -90,11 +87,11 @@ class ExecutionResult implements JsonSerializable
     }
 
     /**
-     * Define custom logic for error handling (filtering, logging, etc).
+     * 定义错误处理的自定义逻辑 (filtering, logging, etc).
      *
-     * Expected handler signature is: function (array $errors, callable $formatter): array
+     * 预期的回调函数: function (array $errors, callable $formatter): array
      *
-     * Default handler is:
+     * 默认的回调函数:
      * function (array $errors, callable $formatter) {
      *     return array_map($formatter, $errors);
      * }
@@ -119,14 +116,11 @@ class ExecutionResult implements JsonSerializable
     }
 
     /**
-     * Converts GraphQL query result to spec-compliant serializable array using provided
-     * errors handler and formatter.
+     * 使用提供的错误处理程序和格式化程序将 GraphQL 查询结果转换为符合规范的可序列化数组
      *
-     * If debug argument is passed, output of error formatter is enriched which debugging information
-     * ("debugMessage", "trace" keys depending on flags).
+     * 如果传递了 debug 参数，则会调整错误格式器的输出，从而调试信息
      *
-     * $debug argument must be either bool (only adds "debugMessage" to result) or sum of flags from
-     * GraphQL\Error\Debug
+     * $debug 参数必须是 bool 类型 (只将 "debugMessage" 添加到结果) 或 GraphQL\Error\Debug 中的总和
      *
      * @param bool|int $debug
      *
@@ -138,7 +132,7 @@ class ExecutionResult implements JsonSerializable
     {
         $result = [];
 
-        if (! empty($this->errors)) {
+        if (!empty($this->errors)) {
             $errorsHandler = $this->errorsHandler ?: static function (array $errors, callable $formatter) {
                 return array_map($formatter, $errors);
             };
@@ -153,7 +147,7 @@ class ExecutionResult implements JsonSerializable
             $result['data'] = $this->data;
         }
 
-        if (! empty($this->extensions)) {
+        if (!empty($this->extensions)) {
             $result['extensions'] = $this->extensions;
         }
 

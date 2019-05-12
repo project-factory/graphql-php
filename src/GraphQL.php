@@ -26,51 +26,28 @@ use function trigger_error;
 use const E_USER_DEPRECATED;
 
 /**
- * This is the primary facade for fulfilling GraphQL operations.
- * See [related documentation](executing-queries.md).
+ * 这是完成 GraphQL 操作的门面对象，查看 [相关文档] (executing-queries.md).
  */
 class GraphQL
 {
     /**
-     * Executes graphql query.
+     * 执行 GraphQL 查询
      *
-     * More sophisticated GraphQL servers, such as those which persist queries,
-     * may wish to separate the validation and execution phases to a static time
-     * tooling step, and a server runtime step.
+     * 更复杂的 GraphQL 服务器可能希望将验证和执行阶段分为静态时间工具步骤和服务运行时步骤。
      *
-     * Available options:
+     * 参数说明:
      *
-     * schema:
-     *    The GraphQL type system to use when validating and executing a query.
-     * source:
-     *    A GraphQL language formatted string representing the requested operation.
-     * rootValue:
-     *    The value provided as the first argument to resolver functions on the top
-     *    level type (e.g. the query object type).
-     * context:
-     *    The value provided as the third argument to all resolvers.
-     *    Use this to pass current session, user data, etc
-     * variableValues:
-     *    A mapping of variable name to runtime value to use for all variables
-     *    defined in the requestString.
-     * operationName:
-     *    The name of the operation to use if requestString contains multiple
-     *    possible operations. Can be omitted if requestString contains only
-     *    one operation.
-     * fieldResolver:
-     *    A resolver function to use when one is not provided by the schema.
-     *    If not provided, the default field resolver is used (which looks for a
-     *    value on the source value with the field's name).
-     * validationRules:
-     *    A set of rules for query validation step. Default value is all available rules.
-     *    Empty array would allow to skip query validation (may be convenient for persisted
-     *    queries which are validated before persisting and assumed valid during execution)
+     * @param \GraphQL\Type\Schema $schema 验证和执行查询时使用的GraphQL类型系统
+     * @param string|DocumentNode $source 解析并执行现有的 GraphQL 查询字符
+     * @param mixed $rootValue 作为 Schema 字段解析传递的第一个参数
+     * @param mixed $context 作为所有解析器的第三个参数提供的值，字段解析器之间的共享信息。 常用来传递已登录用户信息，位置详情等
+     * @param array $variableValues 变量的映射，该值将随同查询字符串一起传递
+     * @param string $operationName 包含多个操作时，要使用的操作名称，如果只包含一个操作，则可以省略
+     * @param callable $fieldResolver 当 Scheam 未提供解析器函数时使用的解析器函数，如果未提供则使用默认字段解析程序
+     * @param array $validationRules 查询验证步骤的一组规则，默认值是所有可用规则
+     *          空数组将代表允许跳过查询验证（对于在持久化期间验证并在执行期间假定为有效的持久查询可能很方便）
      *
-     * @param string|DocumentNode $source
-     * @param mixed               $rootValue
-     * @param mixed               $context
-     * @param mixed[]|null        $variableValues
-     * @param ValidationRule[]    $validationRules
+     * @return ExecutionResult
      *
      * @api
      */
@@ -83,7 +60,8 @@ class GraphQL
         ?string $operationName = null,
         ?callable $fieldResolver = null,
         ?array $validationRules = null
-    ) : ExecutionResult {
+    ): ExecutionResult
+    {
         $promiseAdapter = new SyncPromiseAdapter();
 
         $promise = self::promiseToExecute(
@@ -105,10 +83,10 @@ class GraphQL
      * Same as executeQuery(), but requires PromiseAdapter and always returns a Promise.
      * Useful for Async PHP platforms.
      *
-     * @param string|DocumentNode   $source
-     * @param mixed                 $rootValue
-     * @param mixed                 $context
-     * @param mixed[]|null          $variableValues
+     * @param string|DocumentNode $source
+     * @param mixed $rootValue
+     * @param mixed $context
+     * @param mixed[]|null $variableValues
      * @param ValidationRule[]|null $validationRules
      *
      * @api
@@ -123,7 +101,8 @@ class GraphQL
         ?string $operationName = null,
         ?callable $fieldResolver = null,
         ?array $validationRules = null
-    ) : Promise {
+    ): Promise
+    {
         try {
             if ($source instanceof DocumentNode) {
                 $documentNode = $source;
@@ -138,7 +117,7 @@ class GraphQL
                 $queryComplexity->setRawVariableValues($variableValues);
             } else {
                 foreach ($validationRules as $rule) {
-                    if (! ($rule instanceof QueryComplexity)) {
+                    if (!($rule instanceof QueryComplexity)) {
                         continue;
                     }
 
@@ -148,7 +127,7 @@ class GraphQL
 
             $validationErrors = DocumentValidator::validate($schema, $documentNode, $validationRules);
 
-            if (! empty($validationErrors)) {
+            if (!empty($validationErrors)) {
                 return $promiseAdapter->createFulfilled(
                     new ExecutionResult(null, $validationErrors)
                 );
@@ -175,9 +154,9 @@ class GraphQL
      * @deprecated Use executeQuery()->toArray() instead
      *
      * @param string|DocumentNode $source
-     * @param mixed               $rootValue
-     * @param mixed               $contextValue
-     * @param mixed[]|null        $variableValues
+     * @param mixed $rootValue
+     * @param mixed $contextValue
+     * @param mixed[]|null $variableValues
      *
      * @return Promise|mixed[]
      */
@@ -188,7 +167,8 @@ class GraphQL
         $contextValue = null,
         $variableValues = null,
         ?string $operationName = null
-    ) {
+    )
+    {
         trigger_error(
             __METHOD__ . ' is deprecated, use GraphQL::executeQuery()->toArray() as a quick replacement',
             E_USER_DEPRECATED
@@ -220,9 +200,9 @@ class GraphQL
      * @deprecated renamed to executeQuery()
      *
      * @param string|DocumentNode $source
-     * @param mixed               $rootValue
-     * @param mixed               $contextValue
-     * @param mixed[]|null        $variableValues
+     * @param mixed $rootValue
+     * @param mixed $contextValue
+     * @param mixed[]|null $variableValues
      *
      * @return ExecutionResult|Promise
      */
@@ -233,7 +213,8 @@ class GraphQL
         $contextValue = null,
         $variableValues = null,
         ?string $operationName = null
-    ) {
+    )
+    {
         trigger_error(
             __METHOD__ . ' is deprecated, use GraphQL::executeQuery() as a quick replacement',
             E_USER_DEPRECATED
@@ -264,7 +245,7 @@ class GraphQL
      *
      * @api
      */
-    public static function getStandardDirectives() : array
+    public static function getStandardDirectives(): array
     {
         return array_values(Directive::getInternalDirectives());
     }
@@ -276,7 +257,7 @@ class GraphQL
      *
      * @api
      */
-    public static function getStandardTypes() : array
+    public static function getStandardTypes(): array
     {
         return array_values(Type::getStandardTypes());
     }
@@ -301,7 +282,7 @@ class GraphQL
      *
      * @api
      */
-    public static function getStandardValidationRules() : array
+    public static function getStandardValidationRules(): array
     {
         return array_values(DocumentValidator::defaultRules());
     }
@@ -311,12 +292,12 @@ class GraphQL
      *
      * @api
      */
-    public static function setDefaultFieldResolver(callable $fn) : void
+    public static function setDefaultFieldResolver(callable $fn): void
     {
         Executor::setDefaultFieldResolver($fn);
     }
 
-    public static function setPromiseAdapter(?PromiseAdapter $promiseAdapter = null) : void
+    public static function setPromiseAdapter(?PromiseAdapter $promiseAdapter = null): void
     {
         Executor::setPromiseAdapter($promiseAdapter);
     }
@@ -344,7 +325,7 @@ class GraphQL
      *
      * @return Directive[]
      */
-    public static function getInternalDirectives() : array
+    public static function getInternalDirectives(): array
     {
         return self::getStandardDirectives();
     }
